@@ -3,41 +3,46 @@
 #include <time.h>
 #include <math.h>
 
-#define N 10
+double entropy_calculator(int *, int); // Function for calculating the entropy.
 
-double entropy_calculator(int[N]);
-
-void display_entropy(int[N], double);
+void display_entropy(int *, int, double); // Function for displaying contents of the bucket and entropy.
 
 
 int main() {
     srand(time(NULL));
 
-    int bucket[N];
+    int *bucket;
+    int ball_num;
     double entropy;
 
-    for (int i = 0; i < N; i++) {
-        bucket[i] = 1 + rand() % 6;
+    printf("\nPlease enter number of balls in the bucket. (N): ");
+    scanf("%d", &ball_num);
+
+    // Dynamic memory allocation for the bucket array with size of (N).
+    bucket = (int *) malloc(sizeof(int) * ball_num);
+
+    for (int i = 0; i < ball_num; i++) {
+        *(bucket + i) = 1 + rand() % 6; // Put random colored "N" balls in the bucket.
     }
 
-    entropy = entropy_calculator(bucket);
-    display_entropy(bucket, entropy);
+    entropy = entropy_calculator(bucket, ball_num); // Calculate entropy.
+    display_entropy(bucket, ball_num, entropy); // Display.
 
     return 0;
 }
 
 
-double entropy_calculator(int system[N]) {
+double entropy_calculator(int *system, int size) {
     int col_occur[6]; /* Array to track how many times each colour
                        occurred in the bucket.
                        */
     double entropy = 0.0;
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++) { // Set the number of colors occurred to 0 for each color.
         col_occur[i] = 0;
     }
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < size; i++) { // Check the color of the ball, increase the corresponding color by 1.
         if (system[i] == 1)
             col_occur[0]++;
         else if (system[i] == 2)
@@ -55,11 +60,13 @@ double entropy_calculator(int system[N]) {
     }
 
     for (int i = 0; i < 6; i++) {
-        if (*(col_occur + i) == 0) {
+        /* If one of the colors is not in the bucket, entropy cannot be calculated.
+         * In this case, exit(1) */
+        if (col_occur[i] == 0) {
             printf("\nCan't calculate entropy, please try again.");
             exit(1);
         } else {
-            entropy += (col_occur[i] * 1.0 / N) * (log10(col_occur[i] * 1.0 / N) / log10(2));
+            entropy += (*(system + i) * 1.0 / size) * (log10(*(system + i) * 1.0 / size) / log10(2));
         }
 
     }
@@ -68,15 +75,15 @@ double entropy_calculator(int system[N]) {
 }
 
 
-void display_entropy(int system[N], double entropy) {
-    printf("\nWith %d samples, you have the following balls in the bucket:", N);
+void display_entropy(int *system, int size, double entropy) {
+    printf("\nWith %d samples, you have the following balls in the bucket:", size);
 
     printf("\n{");
-    for (int i = 0; i < N; i++) {
-        if (i == N - 1)
-            printf("%d}", system[i]);
+    for (int i = 0; i < size; i++) { // Display contents of bucket in form of {#1, #2, #3, ... , #N}
+        if (i == size - 1)
+            printf("%d}", *(system + i));
         else
-            printf("%d, ", system[i]);
+            printf("%d, ", *(system + i));
     }
 
     printf("\nAnd the entropy is = %.2lf", entropy);
