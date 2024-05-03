@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
-project(EntrophyCalculationSimulator C)
+project(EntropyCalculationSimulator C)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 
-add_executable(EntrophyCalculationSimulator
-        main.c)
+add_executable(EntropyCalculationSimulator main.c)
